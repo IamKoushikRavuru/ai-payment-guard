@@ -1,0 +1,2467 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "AI-Native Observability & Threat Detection Engine for Global Payment APIs",
+    "description": "Enterprise-grade runtime security, prompt injection detection, financial logic validation, and PCI DLP redaction engine for autonomous payment agents.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "Health & Status"
+        ],
+        "summary": "Basic health probe",
+        "description": "Lightweight readiness/liveness probe for load balancers and orchestrators.",
+        "operationId": "health_check_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Health Check Health Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/system/status": {
+      "get": {
+        "tags": [
+          "Health & Status"
+        ],
+        "summary": "System diagnostics and AI status",
+        "description": "Returns deep diagnostics on database connectivity, external AI provider key status, and loaded models.",
+        "operationId": "system_status_api_v1_system_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/transactions": {
+      "post": {
+        "tags": [
+          "Transactions"
+        ],
+        "summary": "Process Payment Transaction",
+        "description": "Submits a payment instruction through the full AI-Native layered security engine.\nPipeline: Prompt Scan -> Financial Policy Check -> Gate Validation -> DLP -> Risk Engine -> Ledger.",
+        "operationId": "create_transaction_api_v1_transactions_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransactionCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Transactions"
+        ],
+        "summary": "List Recent Transactions",
+        "description": "Retrieves paginated transactions from the audit ledger.",
+        "operationId": "list_transactions_api_v1_transactions_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/transactions/{transaction_id}": {
+      "get": {
+        "tags": [
+          "Transactions"
+        ],
+        "summary": "Get Transaction by ID",
+        "description": "Fetches full transaction audit record by transaction ID.",
+        "operationId": "get_transaction_api_v1_transactions__transaction_id__get",
+        "parameters": [
+          {
+            "name": "transaction_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Transaction Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/agent/evaluate": {
+      "post": {
+        "tags": [
+          "Autonomous Payment Agent"
+        ],
+        "summary": "Evaluate User Instruction with Autonomous Agent",
+        "description": "Evaluates natural language payment instruction through the autonomous payment agent,\nenforcing pre-execution injection scanning, multi-turn crescendo checks, and post-execution PCI DLP redaction.",
+        "operationId": "evaluate_agent_instruction_api_v1_agent_evaluate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentEvaluateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentDecisionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sessions": {
+      "get": {
+        "tags": [
+          "Conversational Sessions"
+        ],
+        "summary": "List Multi-Turn Agent Sessions",
+        "description": "Returns summaries of all active and historical multi-turn conversational agent sessions.",
+        "operationId": "list_sessions_api_v1_sessions_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "description": "Max sessions to return",
+              "default": 50,
+              "title": "Limit"
+            },
+            "description": "Max sessions to return"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SessionSummaryResponse"
+                  },
+                  "title": "Response List Sessions Api V1 Sessions Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sessions/{session_id}": {
+      "get": {
+        "tags": [
+          "Conversational Sessions"
+        ],
+        "summary": "Get Session Detail and Turn History",
+        "description": "Returns full conversation turn history, risk escalation trajectory, and lock status for a session.",
+        "operationId": "get_session_detail_api_v1_sessions__session_id__get",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionDetailResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sessions/{session_id}/reset": {
+      "post": {
+        "tags": [
+          "Conversational Sessions"
+        ],
+        "summary": "Reset Session Lock Status",
+        "description": "Resets session lock state and violation counter after operator review.",
+        "operationId": "reset_session_api_v1_sessions__session_id__reset_post",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionDetailResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/security/scan": {
+      "post": {
+        "tags": [
+          "Security & Threat Detection"
+        ],
+        "summary": "Full Multi-Layer Security Scan",
+        "description": "Performs full zero-trust security scan combining prompt injection,\njailbreak, financial manipulation, logic validator, and DLP layers.",
+        "operationId": "scan_full_api_v1_security_scan_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FullSecurityScanRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SecurityScanResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/security/scan-prompt": {
+      "post": {
+        "tags": [
+          "Security & Threat Detection"
+        ],
+        "summary": "Dedicated Prompt Threat Scan",
+        "description": "Fast-path scan focusing specifically on user prompt injection,\njailbreak attempts, and financial instruction manipulation.",
+        "operationId": "scan_prompt_api_v1_security_scan_prompt_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromptScanRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/security/scan-response": {
+      "post": {
+        "tags": [
+          "Security & Threat Detection"
+        ],
+        "summary": "DLP and PAN Response Scanner",
+        "description": "Outbound response DLP scanner. Detects, validates with Luhn,\nand masks PANs, CVVs, and credentials before user delivery.",
+        "operationId": "scan_response_api_v1_security_scan_response_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResponseScanRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/security/events": {
+      "get": {
+        "tags": [
+          "Security & Threat Detection"
+        ],
+        "summary": "List Security Events",
+        "description": "Lists security events with optional severity filter.",
+        "operationId": "list_security_events_api_v1_security_events_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "severity",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by severity: LOW, MEDIUM, HIGH, CRITICAL",
+              "title": "Severity"
+            },
+            "description": "Filter by severity: LOW, MEDIUM, HIGH, CRITICAL"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SecurityEventListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/security/events/{event_id}": {
+      "get": {
+        "tags": [
+          "Security & Threat Detection"
+        ],
+        "summary": "Get Security Event by ID",
+        "description": "Retrieves full details of a specific security event.",
+        "operationId": "get_security_event_api_v1_security_events__event_id__get",
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Event Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SecurityEventResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/alerts": {
+      "get": {
+        "tags": [
+          "Alerts & Incident Response"
+        ],
+        "summary": "List Security Alerts",
+        "description": "Lists alerts with active count and resolution status filtering.",
+        "operationId": "list_alerts_api_v1_alerts_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "is_resolved",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by resolution status",
+              "title": "Is Resolved"
+            },
+            "description": "Filter by resolution status"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/alerts/{alert_id}/resolve": {
+      "post": {
+        "tags": [
+          "Alerts & Incident Response"
+        ],
+        "summary": "Resolve Alert",
+        "description": "Marks an active security alert as investigated and resolved by an analyst.",
+        "operationId": "resolve_alert_api_v1_alerts__alert_id__resolve_post",
+        "parameters": [
+          {
+            "name": "alert_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Alert Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AlertResolveRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/analytics/summary": {
+      "get": {
+        "tags": [
+          "SOC Analytics & Model Registry"
+        ],
+        "summary": "SOC Executive Dashboard Overview",
+        "description": "Provides high-level metrics for the main security monitoring dashboard.",
+        "operationId": "get_overview_summary_api_v1_analytics_summary_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OverviewSummaryResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/analytics/risk": {
+      "get": {
+        "tags": [
+          "SOC Analytics & Model Registry"
+        ],
+        "summary": "Real-Time Threat Feed",
+        "description": "Returns chronologically ordered threat events for live SOC threat feed.",
+        "operationId": "get_threat_feed_api_v1_analytics_risk_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ThreatFeedItem"
+                  },
+                  "title": "Response Get Threat Feed Api V1 Analytics Risk Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/analytics/drift": {
+      "get": {
+        "tags": [
+          "SOC Analytics & Model Registry"
+        ],
+        "summary": "Agent Behavioral Drift Analytics",
+        "description": "Evaluates behavioral drift over sliding transaction window using Wasserstein & PSI.",
+        "operationId": "get_drift_analytics_api_v1_analytics_drift_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DriftAnalyticsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/analytics/agent-behavior": {
+      "get": {
+        "tags": [
+          "SOC Analytics & Model Registry"
+        ],
+        "summary": "Agent Operational Profile",
+        "description": "Returns behavioral metrics, approval/rejection rates, and latency profile.",
+        "operationId": "get_agent_behavior_stats_api_v1_analytics_agent_behavior_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentBehaviorStats"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/analytics/models/status": {
+      "get": {
+        "tags": [
+          "SOC Analytics & Model Registry"
+        ],
+        "summary": "ML Model Registry & Evaluation Metrics",
+        "description": "Returns verified model metadata and evaluation performance from real benchmark runs.",
+        "operationId": "get_models_status_api_v1_analytics_models_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ModelStatusItem"
+                  },
+                  "type": "array",
+                  "title": "Response Get Models Status Api V1 Analytics Models Status Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/models/status": {
+      "get": {
+        "tags": [
+          "Model Registry & Evaluation"
+        ],
+        "summary": "ML Model Status and Real Metrics",
+        "description": "Returns verified model metadata and evaluation performance from real benchmark runs.",
+        "operationId": "get_models_status_api_v1_models_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ModelStatusItem"
+                  },
+                  "type": "array",
+                  "title": "Response Get Models Status Api V1 Models Status Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/simulation/run": {
+      "post": {
+        "tags": [
+          "Traffic & Attack Simulation"
+        ],
+        "summary": "Run Payment Traffic or Attack Simulation",
+        "description": "Executes a reproducible batch of simulated transactions (normal, adversarial, or red-team)\nthrough the live layered security engine and commits audit events.",
+        "operationId": "run_simulation_api_v1_simulation_run_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimulationRunRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Run Simulation Api V1 Simulation Run Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AgentBehaviorMetric": {
+        "properties": {
+          "metric_name": {
+            "type": "string",
+            "title": "Metric Name"
+          },
+          "baseline_mean": {
+            "type": "number",
+            "title": "Baseline Mean"
+          },
+          "baseline_std": {
+            "type": "number",
+            "title": "Baseline Std"
+          },
+          "current_value": {
+            "type": "number",
+            "title": "Current Value"
+          },
+          "deviation_z_score": {
+            "type": "number",
+            "title": "Deviation Z Score"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "NORMAL",
+              "WARNING",
+              "DRIFT_DETECTED"
+            ],
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "metric_name",
+          "baseline_mean",
+          "baseline_std",
+          "current_value",
+          "deviation_z_score",
+          "status"
+        ],
+        "title": "AgentBehaviorMetric"
+      },
+      "AgentBehaviorStats": {
+        "properties": {
+          "agent_id": {
+            "type": "string",
+            "title": "Agent Id"
+          },
+          "total_decisions": {
+            "type": "integer",
+            "title": "Total Decisions"
+          },
+          "approval_rate": {
+            "type": "number",
+            "title": "Approval Rate"
+          },
+          "rejection_rate": {
+            "type": "number",
+            "title": "Rejection Rate"
+          },
+          "avg_latency_ms": {
+            "type": "number",
+            "title": "Avg Latency Ms"
+          },
+          "avg_risk_score": {
+            "type": "number",
+            "title": "Avg Risk Score"
+          },
+          "metrics": {
+            "items": {
+              "$ref": "#/components/schemas/AgentBehaviorMetric"
+            },
+            "type": "array",
+            "title": "Metrics"
+          }
+        },
+        "type": "object",
+        "required": [
+          "agent_id",
+          "total_decisions",
+          "approval_rate",
+          "rejection_rate",
+          "avg_latency_ms",
+          "avg_risk_score",
+          "metrics"
+        ],
+        "title": "AgentBehaviorStats"
+      },
+      "AgentDecisionResponse": {
+        "properties": {
+          "transaction_id": {
+            "type": "string",
+            "title": "Transaction Id"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          },
+          "turn_index": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Turn Index"
+          },
+          "source_currency": {
+            "type": "string",
+            "title": "Source Currency"
+          },
+          "destination_currency": {
+            "type": "string",
+            "title": "Destination Currency"
+          },
+          "amount": {
+            "type": "number",
+            "title": "Amount"
+          },
+          "exchange_rate": {
+            "type": "number",
+            "title": "Exchange Rate"
+          },
+          "destination_country": {
+            "type": "string",
+            "title": "Destination Country"
+          },
+          "route": {
+            "type": "string",
+            "title": "Route"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "APPROVE",
+              "FLAG",
+              "REJECT",
+              "BLOCKED"
+            ],
+            "title": "Decision"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "agent_risk_score": {
+            "type": "number",
+            "title": "Agent Risk Score"
+          },
+          "raw_response": {
+            "type": "string",
+            "title": "Raw Response"
+          },
+          "tool_calls": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tool Calls"
+          },
+          "execution_latency_ms": {
+            "type": "number",
+            "title": "Execution Latency Ms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "transaction_id",
+          "source_currency",
+          "destination_currency",
+          "amount",
+          "exchange_rate",
+          "destination_country",
+          "route",
+          "decision",
+          "reason",
+          "agent_risk_score",
+          "raw_response",
+          "execution_latency_ms"
+        ],
+        "title": "AgentDecisionResponse"
+      },
+      "AgentEvaluateRequest": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "title": "User Id",
+            "description": "Client or session ID",
+            "default": "usr_agent_01"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id",
+            "description": "Optional session ID for stateful multi-turn conversational tracking"
+          },
+          "user_prompt": {
+            "type": "string",
+            "title": "User Prompt",
+            "description": "Natural language instruction for the autonomous payment agent"
+          },
+          "context_metadata": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Context Metadata"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_prompt"
+        ],
+        "title": "AgentEvaluateRequest"
+      },
+      "AlertListResponse": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "active_count": {
+            "type": "integer",
+            "title": "Active Count"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AlertResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "active_count",
+          "items"
+        ],
+        "title": "AlertListResponse"
+      },
+      "AlertResolveRequest": {
+        "properties": {
+          "resolved_by": {
+            "type": "string",
+            "title": "Resolved By"
+          },
+          "resolution_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolution Notes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "resolved_by"
+        ],
+        "title": "AlertResolveRequest"
+      },
+      "AlertResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "security_event_id": {
+            "type": "string",
+            "title": "Security Event Id"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH",
+              "CRITICAL"
+            ],
+            "title": "Severity"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "is_resolved": {
+            "type": "boolean",
+            "title": "Is Resolved"
+          },
+          "resolved_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved At"
+          },
+          "resolved_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved By"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "security_event_id",
+          "severity",
+          "title",
+          "description",
+          "is_resolved",
+          "created_at"
+        ],
+        "title": "AlertResponse"
+      },
+      "ConversationTurnSchema": {
+        "properties": {
+          "turn_index": {
+            "type": "integer",
+            "title": "Turn Index"
+          },
+          "user_prompt": {
+            "type": "string",
+            "title": "User Prompt"
+          },
+          "agent_response": {
+            "type": "string",
+            "title": "Agent Response"
+          },
+          "risk_score": {
+            "type": "number",
+            "title": "Risk Score"
+          },
+          "recommended_action": {
+            "type": "string",
+            "title": "Recommended Action"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "turn_index",
+          "user_prompt",
+          "agent_response",
+          "risk_score",
+          "recommended_action",
+          "timestamp"
+        ],
+        "title": "ConversationTurnSchema"
+      },
+      "DriftAnalyticsResponse": {
+        "properties": {
+          "drift_detected": {
+            "type": "boolean",
+            "title": "Drift Detected"
+          },
+          "overall_drift_score": {
+            "type": "number",
+            "title": "Overall Drift Score"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH",
+              "CRITICAL"
+            ],
+            "title": "Severity"
+          },
+          "affected_features": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Affected Features"
+          },
+          "features_detail": {
+            "items": {
+              "$ref": "#/components/schemas/DriftFeatureReport"
+            },
+            "type": "array",
+            "title": "Features Detail"
+          },
+          "sample_window_size": {
+            "type": "integer",
+            "title": "Sample Window Size"
+          },
+          "analyzed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Analyzed At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "drift_detected",
+          "overall_drift_score",
+          "severity",
+          "affected_features",
+          "features_detail",
+          "sample_window_size",
+          "analyzed_at"
+        ],
+        "title": "DriftAnalyticsResponse"
+      },
+      "DriftFeatureReport": {
+        "properties": {
+          "feature_name": {
+            "type": "string",
+            "title": "Feature Name"
+          },
+          "baseline_value": {
+            "type": "number",
+            "title": "Baseline Value"
+          },
+          "current_window_value": {
+            "type": "number",
+            "title": "Current Window Value"
+          },
+          "drift_metric": {
+            "type": "string",
+            "title": "Drift Metric"
+          },
+          "drift_score": {
+            "type": "number",
+            "title": "Drift Score"
+          },
+          "is_drifted": {
+            "type": "boolean",
+            "title": "Is Drifted"
+          }
+        },
+        "type": "object",
+        "required": [
+          "feature_name",
+          "baseline_value",
+          "current_window_value",
+          "drift_metric",
+          "drift_score",
+          "is_drifted"
+        ],
+        "title": "DriftFeatureReport"
+      },
+      "FullSecurityScanRequest": {
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "title": "Prompt"
+          },
+          "proposed_transaction": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Proposed Transaction"
+          },
+          "agent_response": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Response"
+          },
+          "user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Id",
+            "default": "usr_client"
+          }
+        },
+        "type": "object",
+        "required": [
+          "prompt"
+        ],
+        "title": "FullSecurityScanRequest"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ModelStatusItem": {
+        "properties": {
+          "model_name": {
+            "type": "string",
+            "title": "Model Name"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "dataset_name": {
+            "type": "string",
+            "title": "Dataset Name"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "metrics": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metrics"
+          },
+          "threshold": {
+            "type": "number",
+            "title": "Threshold"
+          },
+          "trained_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Trained At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "model_name",
+          "version",
+          "dataset_name",
+          "status",
+          "metrics",
+          "threshold",
+          "trained_at"
+        ],
+        "title": "ModelStatusItem"
+      },
+      "OverviewSummaryResponse": {
+        "properties": {
+          "total_transactions": {
+            "type": "integer",
+            "title": "Total Transactions"
+          },
+          "approved_transactions": {
+            "type": "integer",
+            "title": "Approved Transactions"
+          },
+          "flagged_transactions": {
+            "type": "integer",
+            "title": "Flagged Transactions"
+          },
+          "blocked_transactions": {
+            "type": "integer",
+            "title": "Blocked Transactions"
+          },
+          "active_alerts": {
+            "type": "integer",
+            "title": "Active Alerts"
+          },
+          "critical_alerts": {
+            "type": "integer",
+            "title": "Critical Alerts"
+          },
+          "average_risk_score": {
+            "type": "number",
+            "title": "Average Risk Score"
+          },
+          "data_leakage_events_count": {
+            "type": "integer",
+            "title": "Data Leakage Events Count"
+          },
+          "agent_health_status": {
+            "type": "string",
+            "enum": [
+              "HEALTHY",
+              "DEGRADED",
+              "CRITICAL"
+            ],
+            "title": "Agent Health Status"
+          },
+          "drift_score": {
+            "type": "number",
+            "title": "Drift Score"
+          },
+          "system_uptime_seconds": {
+            "type": "number",
+            "title": "System Uptime Seconds"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_transactions",
+          "approved_transactions",
+          "flagged_transactions",
+          "blocked_transactions",
+          "active_alerts",
+          "critical_alerts",
+          "average_risk_score",
+          "data_leakage_events_count",
+          "agent_health_status",
+          "drift_score",
+          "system_uptime_seconds"
+        ],
+        "title": "OverviewSummaryResponse"
+      },
+      "PromptScanRequest": {
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "title": "Prompt",
+            "description": "Prompt to scan for injection and jailbreak"
+          },
+          "user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Id",
+            "default": "usr_unknown"
+          },
+          "transaction_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Transaction Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "prompt"
+        ],
+        "title": "PromptScanRequest"
+      },
+      "ResponseScanRequest": {
+        "properties": {
+          "response_text": {
+            "type": "string",
+            "title": "Response Text",
+            "description": "Agent response to scan for PAN and sensitive data"
+          },
+          "transaction_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Transaction Id"
+          },
+          "agent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Id",
+            "default": "autonomous_payment_agent_v1"
+          }
+        },
+        "type": "object",
+        "required": [
+          "response_text"
+        ],
+        "title": "ResponseScanRequest"
+      },
+      "RiskSignal": {
+        "properties": {
+          "detector": {
+            "type": "string",
+            "title": "Detector"
+          },
+          "is_threat": {
+            "type": "boolean",
+            "title": "Is Threat"
+          },
+          "risk_score": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Risk Score"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH",
+              "CRITICAL"
+            ],
+            "title": "Severity"
+          },
+          "confidence": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence"
+          },
+          "technique": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Technique"
+          },
+          "targeted_control": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Targeted Control"
+          },
+          "explanation": {
+            "type": "string",
+            "title": "Explanation"
+          },
+          "metadata": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metadata"
+          }
+        },
+        "type": "object",
+        "required": [
+          "detector",
+          "is_threat",
+          "risk_score",
+          "severity",
+          "confidence",
+          "explanation"
+        ],
+        "title": "RiskSignal"
+      },
+      "SecurityEventListResponse": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SecurityEventResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "items"
+        ],
+        "title": "SecurityEventListResponse"
+      },
+      "SecurityEventResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "transaction_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Transaction Id"
+          },
+          "agent_id": {
+            "type": "string",
+            "title": "Agent Id"
+          },
+          "event_type": {
+            "type": "string",
+            "title": "Event Type"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH",
+              "CRITICAL"
+            ],
+            "title": "Severity"
+          },
+          "risk_score": {
+            "type": "number",
+            "title": "Risk Score"
+          },
+          "confidence": {
+            "type": "number",
+            "title": "Confidence"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "ALLOW",
+              "FLAG",
+              "BLOCK",
+              "REDACT_AND_ALLOW"
+            ],
+            "title": "Action"
+          },
+          "payload_snippet": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payload Snippet"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "agent_id",
+          "event_type",
+          "severity",
+          "risk_score",
+          "confidence",
+          "source",
+          "description",
+          "action",
+          "created_at"
+        ],
+        "title": "SecurityEventResponse"
+      },
+      "SecurityScanResponse": {
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "unified_assessment": {
+            "$ref": "#/components/schemas/UnifiedRiskAssessment"
+          },
+          "security_event_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Security Event Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "timestamp",
+          "unified_assessment"
+        ],
+        "title": "SecurityScanResponse"
+      },
+      "SessionDetailResponse": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "total_turns": {
+            "type": "integer",
+            "title": "Total Turns"
+          },
+          "total_violations": {
+            "type": "integer",
+            "title": "Total Violations"
+          },
+          "session_locked": {
+            "type": "boolean",
+            "title": "Session Locked"
+          },
+          "lock_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lock Reason"
+          },
+          "avg_risk_score": {
+            "type": "number",
+            "title": "Avg Risk Score"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "turns": {
+            "items": {
+              "$ref": "#/components/schemas/ConversationTurnSchema"
+            },
+            "type": "array",
+            "title": "Turns"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "user_id",
+          "total_turns",
+          "total_violations",
+          "session_locked",
+          "avg_risk_score",
+          "created_at",
+          "turns"
+        ],
+        "title": "SessionDetailResponse"
+      },
+      "SessionSummaryResponse": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "total_turns": {
+            "type": "integer",
+            "title": "Total Turns"
+          },
+          "total_violations": {
+            "type": "integer",
+            "title": "Total Violations"
+          },
+          "session_locked": {
+            "type": "boolean",
+            "title": "Session Locked"
+          },
+          "lock_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lock Reason"
+          },
+          "avg_risk_score": {
+            "type": "number",
+            "title": "Avg Risk Score"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "user_id",
+          "total_turns",
+          "total_violations",
+          "session_locked",
+          "avg_risk_score",
+          "created_at"
+        ],
+        "title": "SessionSummaryResponse"
+      },
+      "SimulationRunRequest": {
+        "properties": {
+          "scenario_type": {
+            "type": "string",
+            "enum": [
+              "mixed",
+              "normal",
+              "adversarial",
+              "red_team"
+            ],
+            "title": "Scenario Type",
+            "description": "Type of synthetic payment traffic to generate",
+            "default": "mixed"
+          },
+          "count": {
+            "type": "integer",
+            "maximum": 200.0,
+            "minimum": 1.0,
+            "title": "Count",
+            "description": "Number of synthetic transactions to simulate",
+            "default": 20
+          },
+          "random_seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Random Seed",
+            "description": "Seed for reproducibility",
+            "default": 42
+          }
+        },
+        "type": "object",
+        "title": "SimulationRunRequest"
+      },
+      "SystemStatusResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "HEALTHY",
+              "DEGRADED",
+              "UNHEALTHY"
+            ],
+            "title": "Status"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "environment": {
+            "type": "string",
+            "title": "Environment"
+          },
+          "database_connected": {
+            "type": "boolean",
+            "title": "Database Connected"
+          },
+          "ai_provider_status": {
+            "type": "string",
+            "title": "Ai Provider Status"
+          },
+          "models_loaded": {
+            "type": "integer",
+            "title": "Models Loaded"
+          },
+          "uptime_seconds": {
+            "type": "number",
+            "title": "Uptime Seconds"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "version",
+          "environment",
+          "database_connected",
+          "ai_provider_status",
+          "models_loaded",
+          "uptime_seconds"
+        ],
+        "title": "SystemStatusResponse"
+      },
+      "ThreatFeedItem": {
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "event_id": {
+            "type": "string",
+            "title": "Event Id"
+          },
+          "threat_type": {
+            "type": "string",
+            "title": "Threat Type"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH",
+              "CRITICAL"
+            ],
+            "title": "Severity"
+          },
+          "confidence": {
+            "type": "number",
+            "title": "Confidence"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "explanation": {
+            "type": "string",
+            "title": "Explanation"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "timestamp",
+          "event_id",
+          "threat_type",
+          "severity",
+          "confidence",
+          "action",
+          "explanation",
+          "source"
+        ],
+        "title": "ThreatFeedItem"
+      },
+      "TransactionCreateRequest": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "title": "User Id",
+            "description": "Unique client/user identifier"
+          },
+          "source_currency": {
+            "type": "string",
+            "maxLength": 3,
+            "minLength": 3,
+            "title": "Source Currency",
+            "description": "ISO source currency code"
+          },
+          "destination_currency": {
+            "type": "string",
+            "maxLength": 3,
+            "minLength": 3,
+            "title": "Destination Currency",
+            "description": "ISO destination currency code"
+          },
+          "amount": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Amount",
+            "description": "Amount to send"
+          },
+          "destination_country": {
+            "type": "string",
+            "maxLength": 2,
+            "minLength": 2,
+            "title": "Destination Country",
+            "description": "ISO 2-letter country code"
+          },
+          "route": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Route",
+            "description": "Corridor rail: SEPA, SWIFT, ACH, FEDNOW, etc.",
+            "default": "SEPA"
+          },
+          "user_prompt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Prompt",
+            "description": "Optional natural language instruction"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "source_currency",
+          "destination_currency",
+          "amount",
+          "destination_country"
+        ],
+        "title": "TransactionCreateRequest"
+      },
+      "TransactionListResponse": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TransactionResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "items"
+        ],
+        "title": "TransactionListResponse"
+      },
+      "TransactionResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "source_currency": {
+            "type": "string",
+            "title": "Source Currency"
+          },
+          "destination_currency": {
+            "type": "string",
+            "title": "Destination Currency"
+          },
+          "amount": {
+            "type": "number",
+            "title": "Amount"
+          },
+          "exchange_rate": {
+            "type": "number",
+            "title": "Exchange Rate"
+          },
+          "destination_amount": {
+            "type": "number",
+            "title": "Destination Amount"
+          },
+          "destination_country": {
+            "type": "string",
+            "title": "Destination Country"
+          },
+          "route": {
+            "type": "string",
+            "title": "Route"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "FLAGGED",
+              "BLOCKED",
+              "REJECTED"
+            ],
+            "title": "Status"
+          },
+          "risk_score": {
+            "type": "number",
+            "title": "Risk Score"
+          },
+          "decision_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decision Reason"
+          },
+          "execution_latency_ms": {
+            "type": "number",
+            "title": "Execution Latency Ms"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "source_currency",
+          "destination_currency",
+          "amount",
+          "exchange_rate",
+          "destination_amount",
+          "destination_country",
+          "route",
+          "status",
+          "risk_score",
+          "execution_latency_ms",
+          "created_at"
+        ],
+        "title": "TransactionResponse"
+      },
+      "UnifiedRiskAssessment": {
+        "properties": {
+          "risk_score": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Risk Score",
+            "description": "Calibrated unified risk score (0-100)"
+          },
+          "risk_level": {
+            "type": "string",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH",
+              "CRITICAL"
+            ],
+            "title": "Risk Level"
+          },
+          "recommended_action": {
+            "type": "string",
+            "enum": [
+              "ALLOW",
+              "FLAG",
+              "BLOCK",
+              "REDACT_AND_ALLOW"
+            ],
+            "title": "Recommended Action"
+          },
+          "signals": {
+            "items": {
+              "$ref": "#/components/schemas/RiskSignal"
+            },
+            "type": "array",
+            "title": "Signals"
+          },
+          "masked_output": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Masked Output"
+          },
+          "summary_explanation": {
+            "type": "string",
+            "title": "Summary Explanation"
+          }
+        },
+        "type": "object",
+        "required": [
+          "risk_score",
+          "risk_level",
+          "recommended_action",
+          "signals",
+          "summary_explanation"
+        ],
+        "title": "UnifiedRiskAssessment"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

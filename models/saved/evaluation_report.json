@@ -1,0 +1,46 @@
+{
+  "model_name": "prompt_injection_calibrated_linear_svc",
+  "version": "1.1.0",
+  "primary_test_metrics": {
+    "dataset": "neuralchemy_core_test",
+    "sample_count": 946,
+    "accuracy": 0.9609,
+    "precision": 0.987,
+    "recall": 0.9467,
+    "f1": 0.9665,
+    "roc_auc": 0.9965,
+    "pr_auc": 0.9977,
+    "true_positives": 533,
+    "false_positives": 7,
+    "true_negatives": 376,
+    "false_negatives": 30,
+    "false_positive_rate": 0.0183,
+    "false_negative_rate": 0.0533
+  },
+  "secondary_benchmark_metrics": {
+    "dataset": "shomi28_benchmark",
+    "sample_count": 1147,
+    "accuracy": 0.9651,
+    "precision": 0.9559,
+    "recall": 0.9757,
+    "f1": 0.9657,
+    "roc_auc": 0.9939,
+    "true_positives": 563,
+    "false_positives": 26,
+    "true_negatives": 544,
+    "false_negatives": 14,
+    "false_positive_rate": 0.0456,
+    "false_negative_rate": 0.0243
+  },
+  "taxonomy_classes": [
+    "adversarial_perturbation",
+    "benign",
+    "direct_injection",
+    "encoded_payload",
+    "financial_manipulation",
+    "instruction_override",
+    "jailbreak",
+    "system_prompt_extraction"
+  ],
+  "optimal_decision_threshold": 0.8
+}

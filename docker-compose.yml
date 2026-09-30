@@ -1,0 +1,60 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: payment_guard_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - HOST=0.0.0.0
+      - PORT=8000
+      - LOG_LEVEL=INFO
+      - DATABASE_URL=postgresql+asyncpg://payment_admin:secure_payment_pass@postgres:5432/payment_guard
+      - SYNC_DATABASE_URL=postgresql://payment_admin:secure_payment_pass@postgres:5432/payment_guard
+      - REDIS_URL=redis://redis:6379/0
+      - AI_API_KEY=${AI_API_KEY:-your_api_key_here}
+      - AI_PROVIDER=${AI_PROVIDER:-openai}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: payment_guard_postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=payment_guard
+      - POSTGRES_USER=payment_admin
+      - POSTGRES_PASSWORD=secure_payment_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U payment_admin -d payment_guard"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: payment_guard_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  redis_data:

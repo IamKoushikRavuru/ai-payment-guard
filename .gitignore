@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+# Testing & Coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Archives
+*.zip
+*.tar.gz
+
+# Secrets & Environment
+.env
+*.pem
+*.key
+
+# Database
+*.db
+*.sqlite3
+*.db-journal
+
+# ML Data & Artifacts
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+models/saved/*
+!models/saved/.gitkeep
+!models/saved/*.joblib
+!models/saved/*.json
+
+# Frontend & Node
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+*.log
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db

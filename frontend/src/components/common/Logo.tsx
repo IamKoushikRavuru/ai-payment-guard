@@ -1,0 +1,45 @@
+import React from 'react'
+
+export const Logo: React.FC<{ size?: number; className?: string }> = ({ size = 32, className = '' }) => {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 40 40"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      <defs>
+        <linearGradient id="shieldGrad" x1="4" y1="4" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#06B6D4" />
+          <stop offset="100%" stopColor="#3B82F6" />
+        </linearGradient>
+        <linearGradient id="coreGrad" x1="12" y1="12" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#10B981" />
+          <stop offset="100%" stopColor="#06B6D4" />
+        </linearGradient>
+      </defs>
+      <rect width="40" height="40" rx="8" fill="#11151F" stroke="#1E2638" strokeWidth="1.5" />
+      {/* Aegis Shield Silhouette */}
+      <path
+        d="M20 7L31 11.5V20C31 26.5 26.3 32.2 20 34C13.7 32.2 9 26.5 9 20V11.5L20 7Z"
+        stroke="url(#shieldGrad)"
+        strokeWidth="2"
+        fill="none"
+        strokeLinejoin="round"
+      />
+      {/* AI Neural / Financial Flow Circuit */}
+      <path
+        d="M16 20L19 23L24 16"
+        stroke="url(#coreGrad)"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="20" cy="13" r="1.5" fill="#06B6D4" />
+      <circle cx="27" cy="21" r="1.2" fill="#3B82F6" />
+      <circle cx="13" cy="21" r="1.2" fill="#3B82F6" />
+    </svg>
+  )
+}
