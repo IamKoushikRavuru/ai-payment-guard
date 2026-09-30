@@ -2,13 +2,15 @@
 
 [![Python Version](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg?logo=fastapi)](https://fastapi.tiangolo.com)
-[![Scikit-Learn](https://img.shields.io/badge/scikit--learn-1.5+-F7931E.svg?logo=scikit-learn)](https://scikit-learn.org/)
+[![React](https://img.shields.io/badge/React-18.3+-61DAFB.svg?logo=react)](https://react.dev/)
+[![Render](https://img.shields.io/badge/Render-Backend%20Live-46E3B7.svg?logo=render)](https://render.com)
+[![Vercel](https://img.shields.io/badge/Vercel-Frontend%20Live-000000.svg?logo=vercel)](https://vercel.com)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Tests Passing](https://img.shields.io/badge/Tests-29%20Passed-brightgreen.svg)]()
+[![Tests Passing](https://img.shields.io/badge/Tests-35%20Passed-brightgreen.svg)]()
 
 An AI-native runtime security, observability, and threat detection engine designed to monitor and safeguard autonomous AI agents executing financial transactions and cross-border payment operations.
 
-The system prevents prompt injections, jailbreaks, transaction limit tampering, sanctions evasion, agent hallucinations, and cardholder data leaks (PCI DLP) in real time.
+The system prevents prompt injections, jailbreaks, transaction limit tampering, sanctions evasion, agent hallucinations, and cardholder data leaks (PCI DLP) in real time with an interactive 3D SOC Dashboard.
 
 ---
 
@@ -286,3 +288,23 @@ A comprehensive integration guide containing request/response schemas, WebSocket
   - Defends against **Crescendo / boundary-pushing attacks** by tracking risk trajectories across consecutive turns.
   - Defends against **Fragmented / split-payload attacks** by evaluating concatenated sliding turn windows.
   - Enforces **Session Violation Lockout** when $\ge 3$ critical security infractions accumulate in a single session.
+
+---
+
+## 10. 3D Cyber Homepage & SOC Gatekeeper Architecture
+
+- **Interactive 3D Hover Depth**: Realized via `Card3D.tsx` featuring mouse-coordinate 3D tilt perspective (`perspective(1000px) rotateX(...) rotateY(...) scale3d(...)`) with dynamic specular glare overlays.
+- **Strict Access Gatekeeping**: Unauthenticated visitors are restricted to the 3D Homepage. The SOC dashboard is only accessible upon registering a new account or signing in (with PBKDF2-HMAC-SHA256 salted password verification persisted in SQLite).
+- **Live Notifications Popover**: Top-right bell counter tracking real-time WebSocket security alerts with filter tabs, unread counts, and instant drill-down inspection links.
+
+---
+
+## 11. Production Deployment
+
+The project is fully pre-configured for seamless cloud deployment:
+- **Backend**: Hosted on [Render](https://render.com) using containerized FastAPI / Uvicorn with automated `$PORT` binding.
+- **Frontend**: Hosted on [Vercel](https://vercel.com) using Vite + React with dynamic `wss://` derivation.
+
+For detailed deployment steps, environment variables, and blueprints, see:
+👉 [`DEPLOYMENT.md`](./DEPLOYMENT.md)
+
