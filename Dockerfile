@@ -1,6 +1,6 @@
 # ==============================================================================
 # AI-Native Observability & Threat Detection Engine for Global Payment APIs
-# Multi-Stage Production Dockerfile
+# Multi-Stage Production Dockerfile (Render & Cloud Container Compatible)
 # ==============================================================================
 
 FROM python:3.11-slim AS builder
@@ -15,7 +15,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir --user -r requirements.txt
+# Install into standard prefix /install so packages can be copied to /usr/local
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
 # Final Runtime Image
 FROM python:3.11-slim AS runner
@@ -28,25 +29,30 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy python dependencies from builder
-COPY --from=builder /root/.local /root/.local
-ENV PATH=/root/.local/bin:$PATH
+# Copy python dependencies globally into /usr/local (world-readable, no root permission issues)
+COPY --from=builder /install /usr/local
+
 ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
 
 # Copy application source code, models, and scripts
 COPY backend/ ./backend/
 COPY models/ ./models/
-COPY data/processed/ ./data/processed/
+COPY data/ ./data/
 COPY scripts/ ./scripts/
 COPY .env.example .env
 
-# Create non-root user for container security
-RUN useradd -m -u 1001 appuser && chown -R appuser:appuser /app
+# Create non-root user and ensure full ownership of working directory for SQLite db
+RUN useradd -m -u 1001 appuser && \
+    mkdir -p /app/data /app/models && \
+    chown -R appuser:appuser /app
+
 USER appuser
 
 EXPOSE 8000
 
 HEALTHCHECK --interval=15s --timeout=5s --start-period=10s --retries=3 \
-    CMD curl -f http://localhost:8000/health || exit 1
+    CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
 
-CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Support dynamic Render $PORT or fallback to 8000
+CMD ["sh", "-c", "uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
