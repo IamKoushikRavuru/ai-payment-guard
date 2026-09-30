@@ -31,10 +31,20 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       return
     }
 
-    const host = window.location.hostname || 'localhost'
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    // Connect to port 8000 or proxy
-    const wsUrl = import.meta.env.VITE_WS_URL || `${protocol}//${host}:8000/ws/security-events`
+    let wsUrl = import.meta.env.VITE_WS_URL
+
+    if (!wsUrl) {
+      const apiBase = import.meta.env.VITE_API_BASE_URL
+      if (apiBase) {
+        // Automatically convert https://... to wss://... and http:// to ws://
+        const wsBase = apiBase.replace(/^http:/, 'ws:').replace(/^https:/, 'wss:').replace(/\/+$/, '')
+        wsUrl = `${wsBase}/ws/security-events`
+      } else {
+        const host = window.location.hostname || 'localhost'
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+        wsUrl = `${protocol}//${host}:8000/ws/security-events`
+      }
+    }
 
     try {
       const socket = new WebSocket(wsUrl)
